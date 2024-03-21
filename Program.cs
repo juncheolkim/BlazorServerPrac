@@ -1,6 +1,9 @@
 using BlazorServerProj.Components;
 using BlazorServerProj.Components.Account;
 using BlazorServerProj.Data;
+using BlazorServerProj.Interfaces;
+using BlazorServerProj.Models;
+using BlazorServerProj.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +37,12 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddDefaultTokenProviders();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+
+// connectionString을 옵션으로 주기도 하지만, BlazorServerDBContext는 내부에 OnConfiguring이 이를 수행한다.
+builder.Services.AddDbContext<BlazorServerDbContext>();
+builder.Services.AddScoped<IDatabase<GangnamguPopulation>, GangnamguPopulationService>();
+//builder.Services.AddSingleton
+//builder.Services.AddTransient
 
 var app = builder.Build();
 
