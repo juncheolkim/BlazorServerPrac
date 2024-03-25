@@ -1,6 +1,7 @@
 ﻿@page "/"
 @inject IDatabase<GangnamguPopulation> DatabaseService;
 @rendermode RenderMode.InteractiveServer
+@using System.Diagnostics
 
 <PageTitle>G.P.L | Dashboard</PageTitle>
 
@@ -9,17 +10,19 @@
 <div class="row my-1">
     <div class="col-sm-12 col-lg-12">
         <RadzenCard>
-            <RadzenLabel Text="🐧 Welcome to Gangnamgu-Population Lab !"/>
+            <RadzenLabel Text="🐧 Welcome to Gangnamgu-Population Lab !" />
         </RadzenCard>
     </div>
 </div>
+
 <div class="row my-5">
     <RadzenText TextStyle="TextStyle.H6">👍 Search Detail</RadzenText>
     <RadzenStack Orientation="Orientation.Horizontal">
-        <RadzenDropDown Data="@administrativeAgency" @bind-Value="value"/>
+        <RadzenDropDown Data="@administrativeAgency" @bind-Value="value" />
         <RadzenButton Click="SearchDetail">Search</RadzenButton>
     </RadzenStack>
 </div>
+
 <div class="row my-5">
     <div class="col-sm-12 col-lg-2">
         <RadzenCard>
@@ -71,10 +74,176 @@
     </div>
 </div>
 
+<div class="row my-5">
+    <div class="col-sm-12 col-lg-8">
+        <RadzenText TextStyle="TextStyle.H6">행정동 인구수 TOP 10</RadzenText>
+        <RadzenCard>
+            <RadzenChart ColorScheme="ColorScheme.Palette">
+                <RadzenLineSeries Data="@gangnamguPopulations?.OrderByDescending(c=>c.TotalPopulation).Take(10)"
+                                  CategoryProperty="AdministrativeAgency"
+                                  ValueProperty="TotalPopulation"
+                                  Title="Total Population(Line)"
+                                  LineType="LineType.Dashed">
+                    <RadzenMarkers MarkerType="MarkerType.Diamond" />
+                    <RadzenSeriesDataLabels Visible="@isShowDataLabel" />
+                </RadzenLineSeries>
+                <RadzenColumnSeries Data="@gangnamguPopulations?.OrderByDescending(c=>c.TotalPopulation).Take(10)"
+                                    CategoryProperty="AdministrativeAgency"
+                                    ValueProperty="TotalPopulation"
+                                    Title="Total Population(Column)">
+                </RadzenColumnSeries>
+                <RadzenLegend Position="LegendPosition.Bottom" />
+                <RadzenColumnOptions Radius="5" Width="50" />
+                <RadzenCategoryAxis Padding="5" />
+                <RadzenValueAxis Min="0" Max="60000" Step="10000">
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Total Population" />
+                </RadzenValueAxis>
+            </RadzenChart>
+        </RadzenCard>
+    </div>
+    <div class="col-sm-12 col-lg-4">
+        <RadzenText TextStyle="TextStyle.H6">행정동 인구수 TOP 10</RadzenText>
+        <RadzenCard>
+            <RadzenChart ColorScheme="ColorScheme.Palette">
+                <RadzenPieSeries Data="@gangnamguPopulations?.OrderByDescending(c=>c.TotalPopulation).Take(10)"
+                                 CategoryProperty="AdministrativeAgency"
+                                 ValueProperty="TotalPopulation"
+                                 Title="Total Pipulation(Pie)">
+                </RadzenPieSeries>
+            </RadzenChart>
+        </RadzenCard>
+    </div>
+</div>
+
+<div class="row my-5">
+    <div class="col-sm-12 col-lg-4">
+        <RadzenText TextStyle="TextStyle.H6">남자 인구수 Top5</RadzenText>
+        <RadzenCard>
+            <RadzenChart ColorScheme="ColorScheme.Palette">
+                <RadzenDonutSeries Data="@gangnamguPopulations?.OrderByDescending(c=>c.MalePopulation).Take(5)"
+                                   CategoryProperty="AdministrativeAgency"
+                                   ValueProperty="MalePopulation"
+                                   TotalAngle="180"
+                                   StartAngle="180">
+                    <ChildContent>
+                        <RadzenSeriesDataLabels Visible="@isShowDataLabel" />
+                    </ChildContent>
+                    <TitleTemplate>
+                        <div class="rz-donut-content">
+                            <div>Male Top 5</div>
+                            <div>for 2024</div>
+                        </div>
+                    </TitleTemplate>
+                </RadzenDonutSeries>
+            </RadzenChart>
+        </RadzenCard>
+    </div>
+    <div class="col-sm-12 col-lg-4">
+        <RadzenText TextStyle="TextStyle.H6">여자 인구수 Top5</RadzenText>
+        <RadzenCard>
+            <RadzenChart ColorScheme="ColorScheme.Palette">
+                <RadzenDonutSeries Data="@gangnamguPopulations?.OrderByDescending(c=>c.FemalePopulation).Take(5)"
+                                   CategoryProperty="AdministrativeAgency"
+                                   ValueProperty="FemalePopulation"
+                                   TotalAngle="180"
+                                   StartAngle="180">
+                    <ChildContent>
+                        <RadzenSeriesDataLabels Visible="@isShowDataLabel" />
+                    </ChildContent>
+                    <TitleTemplate>
+                        <div class="rz-donut-content">
+                            <div>Female Top 5</div>
+                            <div>for 2024</div>
+                        </div>
+                    </TitleTemplate>
+                </RadzenDonutSeries>
+            </RadzenChart>
+        </RadzenCard>
+    </div>
+    <div class="col-sm-12 col-lg-4">
+        <RadzenText TextStyle="TextStyle.H6">성비 인구수 Top5</RadzenText>
+        <RadzenCard>
+            <RadzenChart ColorScheme="ColorScheme.Palette">
+                <RadzenDonutSeries Data="@gangnamguPopulations?.OrderByDescending(c=>c.SexRatio).Take(5)"
+                                   CategoryProperty="AdministrativeAgency"
+                                   ValueProperty="SexRatio"
+                                   TotalAngle="180"
+                                   StartAngle="180">
+                    <ChildContent>
+                        <RadzenSeriesDataLabels Visible="@isShowDataLabel" />
+                    </ChildContent>
+                    <TitleTemplate>
+                        <div class="rz-donut-content">
+                            <div>SexRatio Top 5</div>
+                            <div>for 2024</div>
+                        </div>
+                    </TitleTemplate>
+                </RadzenDonutSeries>
+            </RadzenChart>
+        </RadzenCard>
+    </div>
+</div>
+
+<div class="row my-5">
+    <div class="col-sm-12 col-lg-12">
+        <RadzenText TextStyle="TextStyle.H6">인구 통계 Top5 (계/남자/여자)</RadzenText>
+        <RadzenChart ColorScheme="ColorScheme.Palette" Style="height : 400px">
+            <RadzenStackedBarSeries Data="@gangnamguPopulations?.OrderByDescending(c=>c.TotalPopulation).Take(5)"
+                                    CategoryProperty="AdministrativeAgency"
+                                    ValueProperty="TotalPopulation"
+                                    Title="인수구(계)">
+                <RadzenSeriesDataLabels Visible="@isShowDataLabel" />
+            </RadzenStackedBarSeries>
+            <RadzenStackedBarSeries Data="@gangnamguPopulations?.OrderByDescending(c=>c.TotalPopulation).Take(5)"
+                                    CategoryProperty="AdministrativeAgency"
+                                    ValueProperty="MalePopulation"
+                                    Title="인수구(남자)">
+                <RadzenSeriesDataLabels Visible="@isShowDataLabel" />
+            </RadzenStackedBarSeries>
+            <RadzenStackedBarSeries Data="@gangnamguPopulations?.OrderByDescending(c=>c.TotalPopulation).Take(5)"
+                                    CategoryProperty="AdministrativeAgency"
+                                    ValueProperty="FemalePopulation"
+                                    Title="인수구(여자)">
+                <RadzenSeriesDataLabels Visible="@isShowDataLabel" />
+            </RadzenStackedBarSeries>
+            <RadzenValueAxis>
+                <RadzenGridLines Visible="true"/>
+                <RadzenAxisTitle Text="인구수"/>
+            </RadzenValueAxis>
+            <RadzenBarOptions Radius="5" Height="40" />
+        </RadzenChart>
+    </div>
+</div>
+
+<div class="row my-5">
+    <div class="col-sm-12 col-lg-4">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.H6">Do you want to learn about WPF basic ?</RadzenText>
+            <RadzenButton Style="width:100%" Click="@ClickWpf">Click to Link!</RadzenButton>
+        </RadzenCard>
+    </div>
+    <div class="col-sm-12 col-lg-4">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.H6">How about Blazor WebAssembly ?</RadzenText>
+            <RadzenButton Style="width:100%" Click="@ClickBlazorWebAssembly">Click to Link!</RadzenButton>
+        </RadzenCard>
+    </div>
+    <div class="col-sm-12 col-lg-4">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.H6">Blazor Server also here !</RadzenText>
+            <RadzenButton Style="width:100%" Click="@ClickBlazorServer">Click to Link!</RadzenButton>
+        </RadzenCard>
+    </div>
+</div>
+
+
 @code
 {
     private IEnumerable<GangnamguPopulation>? gangnamguPopulations;
     private IEnumerable<string>? administrativeAgency;
+
+    private bool isShowDataLabel = true;
 
     private string value = string.Empty;
     private string selectTotalPopulation = string.Empty;
@@ -101,5 +270,26 @@
         selectSexRatio = data.SexRatio.ToString();
         selectNumberOfHouseholds = data.NumberOfHouseholds.ToString();
         selectNumberOfPeoplePerHousehold = data.NumberOfPeoplePerHousehold.ToString();
+    }
+
+    private void ClickWpf()
+    {
+        string url = "https://learn.microsoft.com/ko-kr/visualstudio/get-started/csharp/tutorial-wpf?view=vs-2022";
+
+        Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+    }
+
+    private void ClickBlazorWebAssembly()
+    {
+        string url = "https://blazorschool.com/tutorial/blazor-wasm/dotnet6";
+
+        Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+    }
+
+    private void ClickBlazorServer()
+    {
+        string url = "https://dotnet.microsoft.com/ko-kr/learn/aspnet/blazor-tutorial/intro";
+
+        Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
     }
 }
