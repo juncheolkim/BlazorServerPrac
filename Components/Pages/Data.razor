@@ -1,23 +1,62 @@
 ﻿@page "/data"
+@inject IDatabase<GangnamguPopulation> DatabaseService
 
-<h3>Data</h3>
 
-<QuickGrid Items="@people">
-    <PropertyColumn Property="@(p => p.PersonId)" Sortable="true" />
-    <PropertyColumn Property="@(p => p.Name)" Sortable="true" />
-    <PropertyColumn Property="@(p => p.PromotionDate)" Format="yyyy-MM-dd" Sortable="true" />
-</QuickGrid>
+<PageTitle>G.P.L | Data</PageTitle>
 
-@code {
-    private record Person(int PersonId, string Name, DateOnly PromotionDate);
+<RadzenText TextStyle="TextStyle.H4">강남구 인구통계 입력</RadzenText>
 
-    private IQueryable<Person> people = new[]
+<RadzenDataGrid Data="items">
+    <Columns>
+        <RadzenDataGridColumn TItem="GangnamguPopulation" Property="Id" Title="Id" >
+            <EditTemplate Context="data">
+                <RadzenNumeric @bind-Value="data.Id" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="GangnamguPopulation" Property="AdministrativeAgency" Title="행정동">
+            <EditTemplate Context="data">
+                <RadzenTextBox @bind-Value="data.AdministrativeAgency" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="GangnamguPopulation" Property="TotalPopulation" Title="인구수(계)">
+            <EditTemplate Context="data">
+                <RadzenNumeric @bind-Value="data.TotalPopulation" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="GangnamguPopulation" Property="MalePopulation" Title="인구수(남자)">
+            <EditTemplate Context="data">
+                <RadzenNumeric @bind-Value="data.MalePopulation" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="GangnamguPopulation" Property="FemalePopulation" Title="인구수(여자)">
+            <EditTemplate Context="data">
+                <RadzenNumeric @bind-Value="data.FemalePopulation" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="GangnamguPopulation" Property="SexRatio" Title="성비">
+            <EditTemplate Context="data">
+                <RadzenNumeric @bind-Value="data.SexRatio" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="GangnamguPopulation" Property="NumberOfHouseholds" Title="세대수">
+            <EditTemplate Context="data">
+                <RadzenNumeric @bind-Value="data.NumberOfHouseholds" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="GangnamguPopulation" Property="NumberOfPeoplePerHousehold" Title="세대당 인구수">
+            <EditTemplate Context="data">
+                <RadzenNumeric @bind-Value="data.NumberOfPeoplePerHousehold" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code 
+{
+    private IEnumerable<GangnamguPopulation> items;
+
+    protected override async Task OnInitializedAsync()
     {
-        new Person(10895, "Jean Martin", new DateOnly(1985, 3, 16)),
-        new Person(10944, "António Langa", new DateOnly(1991, 12, 1)),
-        new Person(11203, "Julie Smith", new DateOnly(1958, 10, 10)),
-        new Person(11205, "Nur Sari", new DateOnly(1922, 4, 27)),
-        new Person(11898, "Jose Hernandez", new DateOnly(2011, 5, 3)),
-        new Person(12130, "Kenji Sato", new DateOnly(2004, 1, 9)),
-    }.AsQueryable();
+        items = await DatabaseService.GetAsync();
+    }
 }

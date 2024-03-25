@@ -1,5 +1,6 @@
 ﻿using BlazorServerProj.Interfaces;
 using BlazorServerProj.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Runtime.InteropServices;
 
 namespace BlazorServerProj.Services
@@ -38,9 +39,9 @@ namespace BlazorServerProj.Services
             }
         }
 
-        public List<GangnamguPopulation>? Get()
+        public async Task<List<GangnamguPopulation>> GetAsync()
         {
-            return this._context?.GangnamguPopulations.ToList();
+            return await this._context.GangnamguPopulations.ToListAsync();
         }
 
         public GangnamguPopulation GetDetail(int? id)
