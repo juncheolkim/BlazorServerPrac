@@ -1,7 +1,105 @@
 ﻿@page "/"
+@inject IDatabase<GangnamguPopulation> DatabaseService;
+@rendermode RenderMode.InteractiveServer
 
-<PageTitle>Home</PageTitle>
+<PageTitle>G.P.L | Dashboard</PageTitle>
 
-<h1>Hello, world!</h1>
+<RadzenText TextStyle="TextStyle.H4">Dashboard</RadzenText>
 
-Welcome to your new app.
+<div class="row my-1">
+    <div class="col-sm-12 col-lg-12">
+        <RadzenCard>
+            <RadzenLabel Text="🐧 Welcome to Gangnamgu-Population Lab !"/>
+        </RadzenCard>
+    </div>
+</div>
+<div class="row my-5">
+    <RadzenText TextStyle="TextStyle.H6">👍 Search Detail</RadzenText>
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenDropDown Data="@administrativeAgency" @bind-Value="value"/>
+        <RadzenButton Click="SearchDetail">Search</RadzenButton>
+    </RadzenStack>
+</div>
+<div class="row my-5">
+    <div class="col-sm-12 col-lg-2">
+        <RadzenCard>
+            <RadzenStack>
+                <RadzenText TextStyle="TextStyle.H6">Total Population</RadzenText>
+                <RadzenText TextStyle="TextStyle.H4" Style="color:darkred" TextAlign="TextAlign.Center">@selectTotalPopulation</RadzenText>
+            </RadzenStack>
+        </RadzenCard>
+    </div>
+    <div class="col-sm-12 col-lg-2">
+        <RadzenCard>
+            <RadzenStack>
+                <RadzenText TextStyle="TextStyle.H6">Male Population</RadzenText>
+                <RadzenText TextStyle="TextStyle.H4" Style="color:darkred" TextAlign="TextAlign.Center">@selectMalePopulation</RadzenText>
+            </RadzenStack>
+        </RadzenCard>
+    </div>
+    <div class="col-sm-12 col-lg-2">
+        <RadzenCard>
+            <RadzenStack>
+                <RadzenText TextStyle="TextStyle.H6">Female Population</RadzenText>
+                <RadzenText TextStyle="TextStyle.H4" Style="color:darkred" TextAlign="TextAlign.Center">@selectFemalePopulation</RadzenText>
+            </RadzenStack>
+        </RadzenCard>
+    </div>
+    <div class="col-sm-12 col-lg-2">
+        <RadzenCard>
+            <RadzenStack>
+                <RadzenText TextStyle="TextStyle.H6">Sex Ratio</RadzenText>
+                <RadzenText TextStyle="TextStyle.H4" Style="color:darkred" TextAlign="TextAlign.Center">@selectSexRatio</RadzenText>
+            </RadzenStack>
+        </RadzenCard>
+    </div>
+    <div class="col-sm-12 col-lg-2">
+        <RadzenCard>
+            <RadzenStack>
+                <RadzenText TextStyle="TextStyle.H6">Number Of Households</RadzenText>
+                <RadzenText TextStyle="TextStyle.H4" Style="color:darkred" TextAlign="TextAlign.Center">@selectNumberOfHouseholds</RadzenText>
+            </RadzenStack>
+        </RadzenCard>
+    </div>
+    <div class="col-sm-12 col-lg-2">
+        <RadzenCard>
+            <RadzenStack>
+                <RadzenText TextStyle="TextStyle.H6">Per Household</RadzenText>
+                <RadzenText TextStyle="TextStyle.H4" Style="color:darkred" TextAlign="TextAlign.Center">@selectNumberOfPeoplePerHousehold</RadzenText>
+            </RadzenStack>
+        </RadzenCard>
+    </div>
+</div>
+
+@code
+{
+    private IEnumerable<GangnamguPopulation>? gangnamguPopulations;
+    private IEnumerable<string>? administrativeAgency;
+
+    private string value = string.Empty;
+    private string selectTotalPopulation = string.Empty;
+    private string selectMalePopulation = string.Empty;
+    private string selectFemalePopulation = string.Empty;
+    private string selectSexRatio = string.Empty;
+    private string selectNumberOfHouseholds = string.Empty;
+    private string selectNumberOfPeoplePerHousehold = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        gangnamguPopulations = await DatabaseService.GetAsync();
+        administrativeAgency = gangnamguPopulations.Select(c => c.AdministrativeAgency).ToList();
+    }
+
+    private void SearchDetail()
+    {
+        var data = this.gangnamguPopulations?.Where(c => c.AdministrativeAgency == value).FirstOrDefault();
+
+        selectTotalPopulation = data.TotalPopulation.ToString();
+        selectMalePopulation = data.MalePopulation.ToString();
+        selectFemalePopulation = data.FemalePopulation.ToString();
+        selectSexRatio = data.SexRatio.ToString();
+        selectNumberOfHouseholds = data.NumberOfHouseholds.ToString();
+        selectNumberOfPeoplePerHousehold = data.NumberOfPeoplePerHousehold.ToString();
+    }
+}
